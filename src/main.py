@@ -14,6 +14,10 @@
 # Switching is done using two buttons which increment and decrement the
 # current state.
 #
+# Additional output-pins signal the current state. Useful either for
+# visualizing with LEDs, or e.g. to pass to a measurement-device like
+# the Nordic PPK2.
+#
 # Author: Bernhard Bablok
 # License: GPL3
 #
@@ -32,11 +36,12 @@ PIN_INC = board.GP27
 PIN_DEC = board.GP26
 PIN_LED = board.LED
 
-STATE_SLEEP = -1
-STATE_IDLE  =  0
-STATE_CONN  =  1
-STATE_UDP   =  2
-STATE_SEND  =  3
+STATE_SLEEP =  0
+STATE_IDLE  =  1
+STATE_CONN  =  2
+STATE_UDP   =  3
+STATE_SEND  =  4
+PINS_STATE  = [board.GP5, board.GP6, board.GP7, board.GP8, board.GP9]
 
 LED_TIME = 0.2
 
@@ -70,8 +75,9 @@ class App:
   def __init__(self):
     """ constructor """
 
-    self._state = STATE_IDLE
     self._setup()
+    self._state = STATE_IDLE
+    self._state_pin[self._state].value = 1
   
   # --- hardware-setup   ----------------------------------------------------
 
@@ -94,6 +100,13 @@ class App:
 
     self._led_pin           = DigitalInOut(PIN_LED)
     self._led_pin.direction = Direction.OUTPUT
+
+    self._state_pin = []
+    for pinnr in PINS_STATE:
+      pin           = DigitalInOut(pinnr)
+      pin.direction = Direction.OUTPUT
+      pin.value     = 0
+      self._state_pin.append(pin)
 
   # --- blink   --------------------------------------------------------------
 
@@ -172,7 +185,9 @@ class App:
       print("starting to send data")
 
     self._blink()
+    self._state_pin[self._state].value = 0
     self._state += 1
+    self._state_pin[self._state].value = 1
 
   # --- handle decrement-button   -------------------------------------------
 
@@ -193,7 +208,9 @@ class App:
       print("stop sending data")
 
     self._blink()
+    self._state_pin[self._state].value = 0
     self._state -= 1
+    self._state_pin[self._state].value = 1
 
   # --- main application loop   ---------------------------------------------
 
