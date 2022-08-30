@@ -47,15 +47,17 @@ Mapping of states to time-points:
   -  04:30 - 05:00  sleep
 
 The states "idle" and "connected" consume about the same (with high variation),
-whereas during data-transfer the (mean) current-draw is much higher.
+whereas during data-transfer the (mean) current-draw is much higher
+(not visible: regular, very short peaks at 250mA, mean at about 70mA).
 
-Depending on the setup (additional peripherals) it might be better to provide
-a dedicated 3V3 source for the ESP-01S.
+Depending on the setup it might be better to provide
+a dedicated 3V3 source for the ESP-01S. This is especially true
+if you have additional peripherals connected to the 3V3-rail.
 
-Sleep mode reduces the current draw for the ESP-01S drastically. Passing
-zero as argument to the `deep_sleep(ms)`-method will prevent wakeup
-until the RST-pin kicks in, which is the normal setup when using
-the ESP-01S as coprocessor.
+Sleep mode reduces the current draw for the ESP-01S drastically
+(measured value was 14.6µA). Passing zero as argument to the
+`deep_sleep(ms)`-method will prevent wakeup until the RST-pin kicks in,
+which is the normal setup when using the ESP-01S as coprocessor.
 
 When searching for "ESP-01S deep-sleep" you will find hardware-mods
 recommending connecting pin 16 of the ESP8266 to the RST-pin. This
